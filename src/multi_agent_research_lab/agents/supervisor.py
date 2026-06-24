@@ -1,7 +1,6 @@
-"""Supervisor / router skeleton."""
+"""Supervisor / router implementation."""
 
 from multi_agent_research_lab.agents.base import BaseAgent
-from multi_agent_research_lab.core.errors import StudentTodoError
 from multi_agent_research_lab.core.state import ResearchState
 
 
@@ -11,12 +10,22 @@ class SupervisorAgent(BaseAgent):
     name = "supervisor"
 
     def run(self, state: ResearchState) -> ResearchState:
-        """Update `state.route_history` with the next route.
+        """Update `state.route_history` with the next route."""
+        
+        # Simple rule-based routing:
+        # If no research notes, route to researcher.
+        # If research notes exist but no analysis, route to analyst.
+        # If both exist but no final answer, route to writer.
+        # Else, done.
+        
+        next_route = "done"
+        
+        if not state.research_notes:
+            next_route = "researcher"
+        elif not state.analysis_notes:
+            next_route = "analyst"
+        elif not state.final_answer:
+            next_route = "writer"
 
-        TODO(student): Implement routing policy. Suggested steps:
-        - Inspect request, current notes, and missing fields.
-        - Choose one of: researcher, analyst, writer, done.
-        - Enforce max iterations and failure fallback.
-        """
-
-        raise StudentTodoError("TODO(student): implement SupervisorAgent.run")
+        state.record_route(next_route)
+        return state
